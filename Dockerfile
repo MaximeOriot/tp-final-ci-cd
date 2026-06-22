@@ -12,20 +12,17 @@ COPY tsconfig*.json nest-cli.json eslint.config.mjs ./
 COPY src ./src
 
 # Builder l'application
-RUN npm run build
-
-# Vérifier que dist a bien été créé
-RUN ls -la /app/dist
-
+# Vérifier que dist a bien été créé 
 # Nettoyer les devDependencies
-RUN npm prune --omit=dev && npm cache clean --force
+RUN npm run build && \
+    ls -la /app/dist && \
+    npm prune --omit=dev && npm cache clean --force
 
 # Stage 2 : Runtime
 FROM node:24-alpine
 
-RUN apk add --no-cache dumb-init
-
-RUN addgroup -g 1001 -S nodejs && \
+RUN apk add --no-cache dumb-init && \
+    addgroup -g 1001 -S nodejs && \
     adduser -S nestjs -u 1001
 
 WORKDIR /app
